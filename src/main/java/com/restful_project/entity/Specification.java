@@ -1,16 +1,18 @@
 package com.restful_project.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.Cascade;
+
+import java.util.List;
 
 @Entity
 @Table(name = "specification")
 public class Specification {
     @Id
     private Long positionid;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "parentsid")
     private Specification parent;
-
     @Column(name = "description")
     private String description;
 

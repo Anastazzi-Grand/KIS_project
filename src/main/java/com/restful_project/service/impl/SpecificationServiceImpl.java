@@ -44,7 +44,6 @@ public class SpecificationServiceImpl implements SpecificationService {
     }
 
     public void deleteSpecification(Long id) {
-
         specificationRepository.deleteById(id);
     }
 }
