@@ -10,7 +10,7 @@ import java.util.List;
 public class Specification {
     @Id
     private Long positionid;
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne()
     @JoinColumn(name = "parentsid")
     private Specification parent;
     @Column(name = "description")

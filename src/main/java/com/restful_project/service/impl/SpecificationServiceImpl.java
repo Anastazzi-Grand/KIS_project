@@ -28,22 +28,23 @@ public class SpecificationServiceImpl implements SpecificationService {
         return specificationRepository.save(specification);
     }
 
-    public Specification updateSpecification(Long id, Specification updatedSpecification) {
-        Specification existingSpecification = getSpecificationById(id);
+    public Specification updateSpecification(Long id, Specification existingSpecification) {
+        Specification updatedSpecification = getSpecificationById(id);
 
-        existingSpecification.setDescription(updatedSpecification.getDescription());
-        existingSpecification.setQuantityPerParent(updatedSpecification.getQuantityPerParent());
-        existingSpecification.setUnitMeasurement(updatedSpecification.getUnitMeasurement());
+        updatedSpecification.setDescription(existingSpecification.getDescription());
+        updatedSpecification.setQuantityPerParent(existingSpecification.getQuantityPerParent());
+        updatedSpecification.setUnitMeasurement(existingSpecification.getUnitMeasurement());
 
-        Long parentId = updatedSpecification.getParent().getPositionid();
+        Long parentId = existingSpecification.getParent().getPositionid();
         Specification parentSpecification = specificationRepository.findById(parentId)
                 .orElse(null);
-        existingSpecification.setParent(parentSpecification);
+        updatedSpecification.setParent(parentSpecification);
 
-        return specificationRepository.save(existingSpecification);
+        return specificationRepository.save(updatedSpecification);
     }
 
     public void deleteSpecification(Long id) {
-        specificationRepository.deleteById(id);
+        Specification specification = getSpecificationById(id);
+        specificationRepository.delete(specification);
     }
 }

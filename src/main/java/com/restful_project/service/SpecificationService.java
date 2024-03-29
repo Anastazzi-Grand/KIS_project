@@ -5,8 +5,6 @@ import com.restful_project.entity.Specification;
 import java.util.List;
 
 public interface SpecificationService {
-
-
      List<Specification> getAllSpecifications();
 
      Specification getSpecificationById(Long id);
