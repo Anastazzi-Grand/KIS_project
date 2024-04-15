@@ -6,6 +6,7 @@ import com.restful_project.repository.OrderRepository;
 import com.restful_project.repository.SpecificationRepository;
 import com.restful_project.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,6 +24,16 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<Order> getAllOrders() {
         return orderRepository.findAll();
+    }
+
+    @Override
+    public List<Order> getAllOrdersSortedById() {
+        return orderRepository.findAll(Sort.by(Sort.Direction.ASC, "id"));
+    }
+
+    @Override
+    public List<Order> getAllOrdersSortedByClientName() {
+        return orderRepository.findAll(Sort.by(Sort.Direction.ASC, "clientName"));
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.restful_project.service;
 
+import com.restful_project.entity.Order;
 import com.restful_project.entity.Specification;
 
 import java.util.List;
@@ -14,4 +15,8 @@ public interface SpecificationService {
      Specification updateSpecification(Long id, Specification updatedSpecification);
 
      void deleteSpecification(Long id);
+
+     List<Specification> getAllSpecificationsSortedById();
+
+     List<Specification> getAllSpecificationsSortedByName();
 }

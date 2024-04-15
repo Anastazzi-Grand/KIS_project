@@ -15,7 +15,6 @@ public class Specification {
     private Specification parent;
     @Column(name = "description")
     private String description;
-
     @Column(name = "quantityperparent")
     private Integer quantityPerParent;
     @Column(name = "unitmeasurement")

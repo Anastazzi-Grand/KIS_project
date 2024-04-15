@@ -1,9 +1,11 @@
 package com.restful_project.service.impl;
 
+import com.restful_project.entity.Order;
 import com.restful_project.entity.Specification;
 import com.restful_project.repository.SpecificationRepository;
 import com.restful_project.service.SpecificationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +19,16 @@ public class SpecificationServiceImpl implements SpecificationService {
 
     public List<Specification> getAllSpecifications() {
         return specificationRepository.findAll();
+    }
+
+    @Override
+    public List<Specification> getAllSpecificationsSortedById() {
+        return specificationRepository.findAll(Sort.by(Sort.Direction.ASC, "positionid"));
+    }
+
+    @Override
+    public List<Specification> getAllSpecificationsSortedByName() {
+        return specificationRepository.findAll(Sort.by(Sort.Direction.ASC, "description"));
     }
 
     public Specification getSpecificationById(Long id) {

@@ -1,5 +1,6 @@
 package com.restful_project.controller;
 
+import com.restful_project.entity.Order;
 import com.restful_project.entity.Specification;
 import com.restful_project.service.SpecificationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,16 @@ public class SpecificationController {
     @GetMapping("/{id}")
     public Specification getSpecificationById(@PathVariable("id") Long id) {
         return specificationService.getSpecificationById(id);
+    }
+
+    @GetMapping("/sortById")
+    public List<Specification> getAllSpecificationsSortedById() {
+        return specificationService.getAllSpecificationsSortedById();
+    }
+
+    @GetMapping("/sortByName")
+    public List<Specification> getAllSpecificationsSortedByName() {
+        return specificationService.getAllSpecificationsSortedByName();
     }
 
     @PostMapping

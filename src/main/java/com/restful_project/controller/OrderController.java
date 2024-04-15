@@ -19,6 +19,16 @@ public class OrderController {
         return orderService.getAllOrders();
     }
 
+    @GetMapping("/sortById")
+    public List<Order> getAllOrdersSortedById() {
+        return orderService.getAllOrdersSortedById();
+    }
+
+    @GetMapping("/sortByName")
+    public List<Order> getAllOrdersSortedByClientName() {
+        return orderService.getAllOrdersSortedByClientName();
+    }
+
     @GetMapping("/{id}")
     public Order getOrderById(@PathVariable("id") Long id) {
         return orderService.getOrderById(id);
