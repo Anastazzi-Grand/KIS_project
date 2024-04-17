@@ -75,7 +75,7 @@ public class StorageServiceImpl implements StorageService {
 
     @Override
     public List<Storage> getAllStoragesSortedById() {
-        return null;
+        return storageRepository.findAll(Sort.by(Sort.Direction.ASC, "idStorage"));
     }
 
     @Override
