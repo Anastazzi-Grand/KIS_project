@@ -9,6 +9,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -55,8 +56,34 @@ public class SpecificationServiceImpl implements SpecificationService {
         return specificationRepository.save(updatedSpecification);
     }
 
-    public void deleteSpecification(Long id) {
+    public void deleteSpecification(Long id, boolean cascade) {
         Specification specification = getSpecificationById(id);
+
+        if (cascade) {
+            deleteChildrenRecursively(specification);
+        }
+
         specificationRepository.delete(specification);
+    }
+
+    private void deleteChildrenRecursively(Specification parent) {
+        List<Specification> childSpecifications = getChildSpecifications(parent.getPositionid());
+        for (Specification child : childSpecifications) {
+            deleteChildrenRecursively(child);
+            specificationRepository.delete(child);
+        }
+    }
+
+    private List<Specification> getChildSpecifications(Long parentId) {
+        List<Specification> allSpecifications = specificationRepository.findAll();
+        List<Specification> childSpecifications = new ArrayList<>();
+
+        for (Specification spec : allSpecifications) {
+            if (spec.getParent() != null && spec.getParent().getPositionid().equals(parentId)) {
+                childSpecifications.add(spec);
+            }
+        }
+
+        return childSpecifications;
     }
 }
