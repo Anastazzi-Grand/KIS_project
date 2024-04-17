@@ -1,6 +1,8 @@
 package com.restful_project.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDate;
 
@@ -26,6 +28,7 @@ public class Order {
 
     @ManyToOne
     @JoinColumn(name = "specificationid")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Specification specificationId;
 
     public Long getId() {

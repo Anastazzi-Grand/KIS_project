@@ -2,6 +2,8 @@ package com.restful_project.entity;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.List;
 
@@ -10,8 +12,9 @@ import java.util.List;
 public class Specification {
     @Id
     private Long positionid;
-    @ManyToOne()
+    @ManyToOne
     @JoinColumn(name = "parentsid")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Specification parent;
     @Column(name = "description")
     private String description;

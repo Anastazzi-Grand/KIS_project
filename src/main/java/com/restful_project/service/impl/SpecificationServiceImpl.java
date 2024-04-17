@@ -56,34 +56,9 @@ public class SpecificationServiceImpl implements SpecificationService {
         return specificationRepository.save(updatedSpecification);
     }
 
-    public void deleteSpecification(Long id, boolean cascade) {
-        Specification specification = getSpecificationById(id);
-
-        if (cascade) {
-            deleteChildrenRecursively(specification);
-        }
-
+    public void deleteSpecification(Long id) {
+        Specification specification = specificationRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Заказ с id " + id + " не найден"));
         specificationRepository.delete(specification);
-    }
-
-    private void deleteChildrenRecursively(Specification parent) {
-        List<Specification> childSpecifications = getChildSpecifications(parent.getPositionid());
-        for (Specification child : childSpecifications) {
-            deleteChildrenRecursively(child);
-            specificationRepository.delete(child);
-        }
-    }
-
-    private List<Specification> getChildSpecifications(Long parentId) {
-        List<Specification> allSpecifications = specificationRepository.findAll();
-        List<Specification> childSpecifications = new ArrayList<>();
-
-        for (Specification spec : allSpecifications) {
-            if (spec.getParent() != null && spec.getParent().getPositionid().equals(parentId)) {
-                childSpecifications.add(spec);
-            }
-        }
-
-        return childSpecifications;
     }
 }

@@ -47,6 +47,6 @@ public class SpecificationController {
 
     @DeleteMapping("/{id}")
     public void deleteSpecification(@PathVariable("id") Long id) {
-        specificationService.deleteSpecification(id, true);
+        specificationService.deleteSpecification(id);
     }
 }

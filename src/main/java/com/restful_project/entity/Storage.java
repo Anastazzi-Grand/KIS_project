@@ -1,11 +1,13 @@
 package com.restful_project.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.Date;
 
 @Entity
-@Table(name = "storages")
+@Table(name = "storage")
 public class Storage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,6 +19,7 @@ public class Storage {
 
     @ManyToOne
     @JoinColumn(name = "idposition", referencedColumnName = "positionid")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Specification idPosition;
 
     @Column(name = "quantity")
