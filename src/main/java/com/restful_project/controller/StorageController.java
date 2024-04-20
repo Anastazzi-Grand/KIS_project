@@ -24,6 +24,11 @@ public class StorageController {
         return storageService.getAllStoragesSortedById();
     }
 
+    @GetMapping("/getCount")
+    public List<String> getCountOfSpecificationInStorage() {
+        return storageService.getCountOfSpecificationInStorage();
+    }
+
     @GetMapping("/{id}")
     public Storage getStorageById(@PathVariable("id") Long id) {
         return storageService.getStorageById(id);

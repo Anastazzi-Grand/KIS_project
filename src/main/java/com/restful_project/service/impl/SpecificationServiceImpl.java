@@ -19,6 +19,7 @@ public class SpecificationServiceImpl implements SpecificationService {
     private SpecificationRepository specificationRepository;
 
     public List<Specification> getAllSpecifications() {
+        System.out.println("GET WORK");
         return specificationRepository.findAll();
     }
 

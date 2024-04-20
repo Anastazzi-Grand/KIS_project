@@ -17,6 +17,6 @@ public interface StorageService {
 
     List<Storage> getAllStoragesSortedById();
 
-    List<Storage> getAllStoragesSortedByName();
+    List<String> getCountOfSpecificationInStorage();
 }
 

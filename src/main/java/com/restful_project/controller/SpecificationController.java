@@ -10,6 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("api/specifications")
+@CrossOrigin(origins = "http://localhost:4200")
 public class SpecificationController {
 
     @Autowired
@@ -17,6 +18,7 @@ public class SpecificationController {
 
     @GetMapping
     public List<Specification> getAllSpecifications() {
+        System.out.println("GET WORK in controller");
         return specificationService.getAllSpecifications();
     }
 

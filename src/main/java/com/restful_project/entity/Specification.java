@@ -8,7 +8,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import java.util.List;
 
 @Entity
-@Table(name = "specification")
+@Table(name = "specifications")
 public class Specification {
     @Id
     private Long positionid;

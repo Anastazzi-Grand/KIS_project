@@ -6,11 +6,12 @@ import com.restful_project.entity.Storage;
 import com.restful_project.repository.SpecificationRepository;
 import com.restful_project.repository.StorageRepository;
 import com.restful_project.service.StorageService;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.*;
 import java.util.Optional;
 
 @Service
@@ -79,7 +80,38 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
-    public List<Storage> getAllStoragesSortedByName() {
-        return null;
+    public List<String> getCountOfSpecificationInStorage() {
+        List<Storage> storages = getAllStorages();
+        Map<Long, Integer> itemQuantities = new HashMap<>();
+
+        for(Storage storage : storages) {
+            Specification specification = storage.getSpecificationId();
+            Long positionId = specification.getPositionid();
+            int quantity = storage.getQuantity();
+
+            if (itemQuantities.containsKey(positionId)) {
+                quantity += itemQuantities.get(positionId);
+            }
+            itemQuantities.put(positionId, quantity);
+        }
+
+        List<String> result = new ArrayList<>();
+        for (Map.Entry<Long, Integer> entry : itemQuantities.entrySet()) {
+            Long positionId = entry.getKey();
+            Integer quantity = entry.getValue();
+            String description = getDescriptionByPositionId(positionId);
+            result.add(description + ": " + quantity + " штук.");
+        }
+
+        return result;
+    }
+
+    private String getDescriptionByPositionId(Long positionId) {
+        Specification specification = specificationRepository.findById(positionId).orElse(null);
+        if (specification != null) {
+            return specification.getDescription();
+        }
+
+        return "Неизвестный объект";
     }
 }
