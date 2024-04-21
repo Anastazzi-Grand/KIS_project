@@ -1,5 +1,7 @@
 package com.restful_project.entity;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.restful_project.service.deserializer.SpecificationDeserializer;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.OnDelete;
@@ -15,6 +17,7 @@ public class Specification {
     @ManyToOne
     @JoinColumn(name = "parentsid")
     @OnDelete(action = OnDeleteAction.CASCADE)
+    @JsonDeserialize(using = SpecificationDeserializer.class)
     private Specification parent;
     @Column(name = "description")
     private String description;

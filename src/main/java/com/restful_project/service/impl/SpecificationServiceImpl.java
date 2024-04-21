@@ -39,27 +39,47 @@ public class SpecificationServiceImpl implements SpecificationService {
     }
 
     public Specification createSpecification(Specification specification) {
+        if (specification.getParent() != null && specification.getParent().getPositionid() != null) {
+            Long parentId = specification.getParent().getPositionid();
+            Specification parentSpecification = getSpecificationById(parentId);
+            specification.setParent(parentSpecification);
+        }
+
+
         return specificationRepository.save(specification);
     }
 
     public Specification updateSpecification(Long id, Specification existingSpecification) {
-        Specification updatedSpecification = getSpecificationById(id);
+        Specification existingSpecificationWithParent = getSpecificationWithParentById(id);
 
-        updatedSpecification.setDescription(existingSpecification.getDescription());
-        updatedSpecification.setQuantityPerParent(existingSpecification.getQuantityPerParent());
-        updatedSpecification.setUnitMeasurement(existingSpecification.getUnitMeasurement());
+        existingSpecificationWithParent.setDescription(existingSpecification.getDescription());
+        existingSpecificationWithParent.setQuantityPerParent(existingSpecification.getQuantityPerParent());
+        existingSpecificationWithParent.setUnitMeasurement(existingSpecification.getUnitMeasurement());
 
-        Long parentId = existingSpecification.getParent().getPositionid();
-        Specification parentSpecification = specificationRepository.findById(parentId)
-                .orElse(null);
-        updatedSpecification.setParent(parentSpecification);
+        existingSpecificationWithParent.setParent(existingSpecification.getParent());
 
-        return specificationRepository.save(updatedSpecification);
+        return specificationRepository.save(existingSpecificationWithParent);
     }
 
     public void deleteSpecification(Long id) {
         Specification specification = specificationRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Заказ с id " + id + " не найден"));
         specificationRepository.delete(specification);
+    }
+
+    private Specification getSpecificationWithParentById(Long id) {
+        Specification specification = getSpecificationById(id);
+        if (specification.getParent() != null) {
+            Long parentId = specification.getParent().getPositionid();
+            if (parentId != null) {
+                Specification parentSpecification = getSpecificationById(parentId);
+                specification.setParent(parentSpecification);
+            } else {
+                specification.setParent(null);
+            }
+        } else {
+            specification.setParent(null);
+        }
+        return specification;
     }
 }

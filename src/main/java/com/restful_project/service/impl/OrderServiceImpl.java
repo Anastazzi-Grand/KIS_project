@@ -44,6 +44,12 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order createOrder(Order order) {
+        Specification specification = order.getSpecificationId();
+        if (specification != null && specification.getPositionid() != null) {
+            Long specificationId = specification.getPositionid();
+            Specification existingSpecification = specificationRepository.findById(specificationId).orElseThrow(() -> new IllegalArgumentException("Спецификация с ID " + specificationId + " не найдена"));
+            order.setSpecificationId(existingSpecification);
+        }
         return orderRepository.save(order);
     }
 
@@ -69,7 +75,6 @@ public class OrderServiceImpl implements OrderService {
         } else {
             updatedOrder.setSpecificationId(null);
         }
-
 
         return orderRepository.save(updatedOrder);
     }

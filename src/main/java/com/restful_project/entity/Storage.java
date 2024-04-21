@@ -1,5 +1,7 @@
 package com.restful_project.entity;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.restful_project.service.deserializer.SpecificationDeserializer;
 import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -17,16 +19,17 @@ public class Storage {
     @Column(name = "dateandtime")
     private Date dateAndTime;
 
-    @ManyToOne
-    @JoinColumn(name = "idposition", referencedColumnName = "positionid")
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private Specification idPosition;
-
     @Column(name = "quantity")
     private Integer quantity;
 
     @Column(name = "typeofoperation")
     private String typeOfOperation;
+
+    @ManyToOne
+    @JoinColumn(name = "idposition", referencedColumnName = "positionid")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JsonDeserialize(using = SpecificationDeserializer.class)
+    private Specification idPosition;
 
     public Specification getSpecificationId() {
         return idPosition;

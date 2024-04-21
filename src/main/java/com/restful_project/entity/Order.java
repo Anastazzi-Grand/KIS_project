@@ -1,5 +1,7 @@
 package com.restful_project.entity;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.restful_project.service.deserializer.SpecificationDeserializer;
 import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -29,6 +31,7 @@ public class Order {
     @ManyToOne
     @JoinColumn(name = "specificationid")
     @OnDelete(action = OnDeleteAction.CASCADE)
+    @JsonDeserialize(using = SpecificationDeserializer.class)
     private Specification specificationId;
 
     public Long getId() {

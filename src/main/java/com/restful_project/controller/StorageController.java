@@ -10,6 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("api/storages")
+@CrossOrigin(origins = "http://localhost:4200")
 public class StorageController {
     @Autowired
     private StorageService storageService;
@@ -24,9 +25,9 @@ public class StorageController {
         return storageService.getAllStoragesSortedById();
     }
 
-    @GetMapping("/getCount")
-    public List<String> getCountOfSpecificationInStorage() {
-        return storageService.getCountOfSpecificationInStorage();
+    @GetMapping("/getCount/{id}")
+    public List<String> getCountOfSpecificationInStorage(Long id) {
+        return storageService.getCountOfSpecificationInStorage(id);
     }
 
     @GetMapping("/{id}")

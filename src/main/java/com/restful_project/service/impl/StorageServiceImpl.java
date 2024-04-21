@@ -36,6 +36,17 @@ public class StorageServiceImpl implements StorageService {
 
     @Override
     public Storage createStorage(Storage storage) {
+        Specification specification = storage.getSpecificationId();
+        if (specification != null) {
+            Long specificationId = specification.getPositionid();
+            if (specificationId != null) {
+                Specification existingSpecification = specificationRepository.findById(specificationId)
+                        .orElseThrow(() -> new IllegalArgumentException("Спецификация с ID " + specificationId + " не найдена"));
+                storage.setIdPosition(existingSpecification);
+            }
+        }
+
+        // Сохраняем хранилище
         return storageRepository.save(storage);
     }
 
@@ -80,7 +91,7 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
-    public List<String> getCountOfSpecificationInStorage() {
+    public List<String> getCountOfSpecificationInStorage(Long id) {
         List<Storage> storages = getAllStorages();
         Map<Long, Integer> itemQuantities = new HashMap<>();
 
