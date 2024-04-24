@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.Optional;
 
@@ -25,6 +26,7 @@ public class StorageServiceImpl implements StorageService {
 
     @Override
     public List<Storage> getAllStorages() {
+        System.out.println("GET ALL STORAGE");
         return storageRepository.findAll();
     }
 
@@ -55,7 +57,7 @@ public class StorageServiceImpl implements StorageService {
         Storage existingStorage = getStorageById(id);
 
         // Обновляем все поля
-        existingStorage.setDateAndTime(updatedStorage.getDateAndTime());
+        existingStorage.setDate(updatedStorage.getDate());
         existingStorage.setIdPosition(updatedStorage.getSpecificationId());
         existingStorage.setQuantity(updatedStorage.getQuantity());
         existingStorage.setTypeOfOperation(updatedStorage.getTypeOfOperation());
@@ -91,27 +93,56 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
-    public List<String> getCountOfSpecificationInStorage(Long id) {
-        List<Storage> storages = getAllStorages();
-        Map<Long, Integer> itemQuantities = new HashMap<>();
+    public StringBuilder getCountOfSpecificationInStorage(Long specificationId) {
+        List<Storage> allItems = storageRepository.findAll();
 
-        for(Storage storage : storages) {
-            Specification specification = storage.getSpecificationId();
-            Long positionId = specification.getPositionid();
-            int quantity = storage.getQuantity();
+        int totalQuantity = 0;
+        boolean found = false;
 
-            if (itemQuantities.containsKey(positionId)) {
-                quantity += itemQuantities.get(positionId);
+        for (Storage item : allItems) {
+            if (item.getSpecificationId().getPositionid() == specificationId) {
+                totalQuantity += item.getQuantity();
+                found = true;
             }
-            itemQuantities.put(positionId, quantity);
         }
 
-        List<String> result = new ArrayList<>();
-        for (Map.Entry<Long, Integer> entry : itemQuantities.entrySet()) {
-            Long positionId = entry.getKey();
-            Integer quantity = entry.getValue();
-            String description = getDescriptionByPositionId(positionId);
-            result.add(description + ": " + quantity + " штук.");
+        StringBuilder result = new StringBuilder();
+
+        if (!found) {
+            result.append("Товара с id ").append(specificationId).append(" нет на складе.");
+        } else {
+            String description = getDescriptionByPositionId(specificationId);
+            result.append(description).append(": ").append(totalQuantity).append(" штук.");
+        }
+
+        return result;
+    }
+
+    @Override
+    public StringBuilder getDeliveriesByDate(LocalDate date) {
+        List<Storage> allItems = storageRepository.findAll();
+
+        Map<String, Integer> deliveriesByItem = new HashMap<>();
+
+        for (Storage item : allItems) {
+            if (item.getDate().isEqual(date)) {
+                String itemName = item.getSpecificationId().getDescription();
+                int quantity = item.getQuantity();
+
+                deliveriesByItem.put(itemName, deliveriesByItem.getOrDefault(itemName, 0) + quantity);
+            }
+        }
+
+        StringBuilder result = new StringBuilder();
+
+        if (deliveriesByItem.isEmpty()) {
+            result.append("Поставок на складе за ").append(date).append(" не было.");
+        } else {
+            result.append("Поставленные товары на склад ").append(date).append(":\n");
+            // Выводим информацию о каждой поставке
+            for (Map.Entry<String, Integer> entry : deliveriesByItem.entrySet()) {
+                result.append(entry.getKey()).append(": ").append(entry.getValue()).append(" шт.\n");
+            }
         }
 
         return result;

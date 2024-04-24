@@ -4,8 +4,10 @@ import com.restful_project.entity.Storage;
 import com.restful_project.service.StorageService;
 import com.restful_project.service.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -26,8 +28,13 @@ public class StorageController {
     }
 
     @GetMapping("/getCount/{id}")
-    public List<String> getCountOfSpecificationInStorage(Long id) {
+    public StringBuilder getCountOfSpecificationInStorage(@PathVariable("id") Long id) {
         return storageService.getCountOfSpecificationInStorage(id);
+    }
+
+    @GetMapping("/deliveries")
+    public StringBuilder getDeliveriesByDate(@RequestParam("date") LocalDate date) {
+        return storageService.getDeliveriesByDate(date);
     }
 
     @GetMapping("/{id}")

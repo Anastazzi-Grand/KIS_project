@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -16,8 +17,9 @@ public class Storage {
     @Column(name = "idstorage")
     private Integer idStorage;
 
-    @Column(name = "dateandtime")
-    private Date dateAndTime;
+    @Column(name = "date")
+    @Temporal(TemporalType.DATE)
+    private LocalDate date;
 
     @Column(name = "quantity")
     private Integer quantity;
@@ -47,12 +49,12 @@ public class Storage {
         this.idStorage = idStorage;
     }
 
-    public Date getDateAndTime() {
-        return dateAndTime;
+    public LocalDate getDate() {
+        return date;
     }
 
-    public void setDateAndTime(Date dateAndTime) {
-        this.dateAndTime = dateAndTime;
+    public void setDate(LocalDate date) {
+        this.date = date;
     }
 
     public Integer getQuantity() {
@@ -75,7 +77,7 @@ public class Storage {
     public String toString() {
         return "Storage{" +
                 "idStorage=" + idStorage +
-                ", dateAndTime=" + dateAndTime +
+                ", dateAndTime=" + date +
                 ", idPosition=" + idPosition +
                 ", quantity=" + quantity +
                 ", typeOfOperation='" + typeOfOperation + '\'' +
