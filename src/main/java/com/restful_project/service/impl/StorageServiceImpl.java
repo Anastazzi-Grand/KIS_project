@@ -1,19 +1,16 @@
 package com.restful_project.service.impl;
 
-import com.restful_project.entity.Order;
 import com.restful_project.entity.Specification;
 import com.restful_project.entity.Storage;
 import com.restful_project.repository.SpecificationRepository;
 import com.restful_project.repository.StorageRepository;
 import com.restful_project.service.StorageService;
-import jakarta.persistence.criteria.CriteriaBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.*;
-import java.util.Optional;
 
 @Service
 public class StorageServiceImpl implements StorageService {
@@ -44,7 +41,7 @@ public class StorageServiceImpl implements StorageService {
             if (specificationId != null) {
                 Specification existingSpecification = specificationRepository.findById(specificationId)
                         .orElseThrow(() -> new IllegalArgumentException("Спецификация с ID " + specificationId + " не найдена"));
-                storage.setIdPosition(existingSpecification);
+                storage.setSpecificationId(existingSpecification);
             }
         }
 
@@ -58,7 +55,7 @@ public class StorageServiceImpl implements StorageService {
 
         // Обновляем все поля
         existingStorage.setDate(updatedStorage.getDate());
-        existingStorage.setIdPosition(updatedStorage.getSpecificationId());
+        existingStorage.setSpecificationId(updatedStorage.getSpecificationId());
         existingStorage.setQuantity(updatedStorage.getQuantity());
         existingStorage.setTypeOfOperation(updatedStorage.getTypeOfOperation());
 
@@ -68,12 +65,12 @@ public class StorageServiceImpl implements StorageService {
             if (specificationId != null) {
                 Specification updatedSpecification = specificationRepository.findById(specificationId)
                         .orElseThrow(() -> new IllegalArgumentException("Спецификация с ID " + specificationId + " не найдена"));
-                existingStorage.setIdPosition(updatedSpecification);
+                existingStorage.setSpecificationId(updatedSpecification);
             } else {
-                existingStorage.setIdPosition(null);
+                existingStorage.setSpecificationId(null);
             }
         } else {
-            existingStorage.setIdPosition(null);
+            existingStorage.setSpecificationId(null);
         }
 
         // Сохраняем обновленную запись

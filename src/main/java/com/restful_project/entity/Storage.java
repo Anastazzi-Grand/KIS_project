@@ -7,7 +7,6 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 @Entity
 @Table(name = "storage")
@@ -28,17 +27,17 @@ public class Storage {
     private String typeOfOperation;
 
     @ManyToOne
-    @JoinColumn(name = "idposition", referencedColumnName = "positionid")
+    @JoinColumn(name = "specificationid", referencedColumnName = "positionid")
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonDeserialize(using = SpecificationDeserializer.class)
-    private Specification idPosition;
+    private Specification specificationId;
 
     public Specification getSpecificationId() {
-        return idPosition;
+        return specificationId;
     }
 
-    public void setIdPosition(Specification idPosition) {
-        this.idPosition = idPosition;
+    public void setSpecificationId(Specification idPosition) {
+        this.specificationId = idPosition;
     }
 
     public Integer getIdStorage() {
@@ -78,7 +77,7 @@ public class Storage {
         return "Storage{" +
                 "idStorage=" + idStorage +
                 ", dateAndTime=" + date +
-                ", idPosition=" + idPosition +
+                ", idPosition=" + specificationId +
                 ", quantity=" + quantity +
                 ", typeOfOperation='" + typeOfOperation + '\'' +
                 '}';
