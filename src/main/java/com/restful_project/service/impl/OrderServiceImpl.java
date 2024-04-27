@@ -2,9 +2,12 @@ package com.restful_project.service.impl;
 
 import com.restful_project.entity.Order;
 import com.restful_project.entity.Specification;
+import com.restful_project.entity.Storage;
 import com.restful_project.repository.OrderRepository;
 import com.restful_project.repository.SpecificationRepository;
+import com.restful_project.repository.StorageRepository;
 import com.restful_project.service.OrderService;
+import com.restful_project.service.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -20,6 +23,12 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private SpecificationRepository specificationRepository;
+
+    @Autowired
+    private StorageService storageService;
+
+    @Autowired
+    private StorageRepository storageRepository;
 
     @Override
     public List<Order> getAllOrders() {
@@ -50,7 +59,18 @@ public class OrderServiceImpl implements OrderService {
             Specification existingSpecification = specificationRepository.findById(specificationId).orElseThrow(() -> new IllegalArgumentException("Спецификация с ID " + specificationId + " не найдена"));
             order.setSpecificationId(existingSpecification);
         }
-        return orderRepository.save(order);
+        // Проверяем наличие товаров на складе
+        boolean orderPlaced = placeOrder(order);
+
+        if (!orderPlaced) {
+            // Если заказ не может быть выполнен из-за нехватки товаров на складе
+            throw new RuntimeException("Невозможно оформить заказ, на складе недостаточно товаров");
+        }
+
+        // Сохраняем заказ в базе данных только если товаров достаточно
+        Order savedOrder = orderRepository.save(order);
+
+        return savedOrder;
     }
 
     @Override
@@ -84,5 +104,28 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Заказ с id " + id + " не найден"));
         orderRepository.delete(order);
+    }
+
+    public boolean placeOrder(Order order) {
+        Specification specification = order.getSpecificationId();
+        Integer orderQuantity = order.getCount();
+
+        // Получаем количество товаров на складе для данной спецификации
+        Integer stockQuantity = storageService.getCountOfSpecificationInStorage(specification.getPositionid());
+
+        if (stockQuantity == 0 || stockQuantity < orderQuantity) {
+            // Если на складе нет достаточного количества товаров, заказ не может быть выполнен
+            return false;
+        }
+
+        // Создаем новую запись в таблице storage с типом операции "отпуск"
+        Storage outboundStorage = new Storage();
+        outboundStorage.setDate(order.getOrderDate());
+        outboundStorage.setQuantity(orderQuantity); // Отрицательное количество для отпуска
+        outboundStorage.setTypeOfOperation("отпуск");
+        outboundStorage.setSpecificationId(specification);
+        storageRepository.save(outboundStorage);
+
+        return true;
     }
 }

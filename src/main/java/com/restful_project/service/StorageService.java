@@ -18,8 +18,10 @@ public interface StorageService {
 
     List<Storage> getAllStoragesSortedById();
 
-    StringBuilder getCountOfSpecificationInStorage(Long id);
+    Integer getCountOfSpecificationInStorage(Long id);
 
     StringBuilder getDeliveriesByDate(LocalDate date);
+
+    List<Storage> getStorages();
 }
 

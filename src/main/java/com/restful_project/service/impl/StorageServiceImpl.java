@@ -23,7 +23,6 @@ public class StorageServiceImpl implements StorageService {
 
     @Override
     public List<Storage> getAllStorages() {
-        System.out.println("GET ALL STORAGE");
         return storageRepository.findAll();
     }
 
@@ -90,29 +89,22 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
-    public StringBuilder getCountOfSpecificationInStorage(Long specificationId) {
+    public Integer getCountOfSpecificationInStorage(Long specificationId) {
         List<Storage> allItems = storageRepository.findAll();
 
         int totalQuantity = 0;
-        boolean found = false;
 
         for (Storage item : allItems) {
-            if (item.getSpecificationId().getPositionid() == specificationId) {
-                totalQuantity += item.getQuantity();
-                found = true;
+            if (item.getSpecificationId().getPositionid().equals(specificationId)) {
+                if (Objects.equals(item.getTypeOfOperation().toLowerCase(), "приход")) {
+                    totalQuantity += item.getQuantity();
+                } else if (Objects.equals(item.getTypeOfOperation().toLowerCase(), "уход")) {
+                    totalQuantity -= item.getQuantity();
+                }
             }
         }
 
-        StringBuilder result = new StringBuilder();
-
-        if (!found) {
-            result.append("Товара с id ").append(specificationId).append(" нет на складе.");
-        } else {
-            String description = getDescriptionByPositionId(specificationId);
-            result.append(description).append(": ").append(totalQuantity).append(" штук.");
-        }
-
-        return result;
+        return totalQuantity;
     }
 
     @Override
@@ -122,7 +114,7 @@ public class StorageServiceImpl implements StorageService {
         Map<String, Integer> deliveriesByItem = new HashMap<>();
 
         for (Storage item : allItems) {
-            if (item.getDate().isEqual(date)) {
+            if (!item.getDate().isAfter(date)) {
                 String itemName = item.getSpecificationId().getDescription();
                 int quantity = item.getQuantity();
 
@@ -133,9 +125,9 @@ public class StorageServiceImpl implements StorageService {
         StringBuilder result = new StringBuilder();
 
         if (deliveriesByItem.isEmpty()) {
-            result.append("Поставок на складе за ").append(date).append(" не было.");
+            result.append("Товаров на складе ").append(date).append(" не было.");
         } else {
-            result.append("Поставленные товары на склад ").append(date).append(":\n");
+            result.append("Товар(ы) на складе ").append(date).append(":\n");
             // Выводим информацию о каждой поставке
             for (Map.Entry<String, Integer> entry : deliveriesByItem.entrySet()) {
                 result.append(entry.getKey()).append(": ").append(entry.getValue()).append(" шт.\n");
@@ -145,12 +137,29 @@ public class StorageServiceImpl implements StorageService {
         return result;
     }
 
-    private String getDescriptionByPositionId(Long positionId) {
-        Specification specification = specificationRepository.findById(positionId).orElse(null);
-        if (specification != null) {
-            return specification.getDescription();
+    @Override
+    public List<Storage> getStorages() {
+        List<Storage> storages = new ArrayList<>();
+        List<Specification> allSpecifications = specificationRepository.findAll();
+
+        LocalDate date = LocalDate.now();
+
+        for (Specification specification : allSpecifications) {
+            Long specificationId = specification.getPositionid();
+            Integer totalQuantity = getCountOfSpecificationInStorage(specificationId);
+
+            if (totalQuantity > 0) {
+                Storage storage = new Storage();
+                storage.setIdStorage(null);
+                storage.setDate(date);
+                storage.setQuantity(totalQuantity);
+                storage.setTypeOfOperation("Текущее количество");
+                storage.setSpecificationId(specification);
+
+                storages.add(storage);
+            }
         }
 
-        return "Неизвестный объект";
+        return storages;
     }
 }

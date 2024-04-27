@@ -28,8 +28,13 @@ public class StorageController {
     }
 
     @GetMapping("/getCount/{id}")
-    public StringBuilder getCountOfSpecificationInStorage(@PathVariable("id") Long id) {
+    public Integer getCountOfSpecificationInStorage(@PathVariable("id") Long id) {
         return storageService.getCountOfSpecificationInStorage(id);
+    }
+
+    @GetMapping("/getStorages")
+    public List<Storage> getStorages() {
+        return storageService.getStorages();
     }
 
     @GetMapping("/deliveries")
