@@ -2,8 +2,10 @@ package com.restful_project.service.impl;
 
 import com.restful_project.entity.Specification;
 import com.restful_project.entity.Storage;
+import com.restful_project.entity.model.StorageStatistic;
 import com.restful_project.repository.SpecificationRepository;
 import com.restful_project.repository.StorageRepository;
+import com.restful_project.service.SpecificationService;
 import com.restful_project.service.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class StorageServiceImpl implements StorageService {
@@ -21,6 +24,9 @@ public class StorageServiceImpl implements StorageService {
     @Autowired
     private SpecificationRepository specificationRepository;
 
+    @Autowired
+    private SpecificationServiceImpl specificationService;
+
     @Override
     public List<Storage> getAllStorages() {
         return storageRepository.findAll();
@@ -29,7 +35,7 @@ public class StorageServiceImpl implements StorageService {
     @Override
     public Storage getStorageById(Long id) {
         return storageRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Order not found with id: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Ячейка нет с id: " + id));
     }
 
     @Override
@@ -38,8 +44,7 @@ public class StorageServiceImpl implements StorageService {
         if (specification != null) {
             Long specificationId = specification.getPositionid();
             if (specificationId != null) {
-                Specification existingSpecification = specificationRepository.findById(specificationId)
-                        .orElseThrow(() -> new IllegalArgumentException("Спецификация с ID " + specificationId + " не найдена"));
+                Specification existingSpecification = specificationService.getSpecificationWithParentById(specificationId);
                 storage.setSpecificationId(existingSpecification);
             }
         }
@@ -79,7 +84,7 @@ public class StorageServiceImpl implements StorageService {
     @Override
     public void deleteStorage(Long id) {
         Storage storage = storageRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Заказ с id " + id + " не найден"));
+                .orElseThrow(() -> new IllegalArgumentException("Заказ с id " + id + " не найден"));
         storageRepository.delete(storage);
     }
 
@@ -100,6 +105,8 @@ public class StorageServiceImpl implements StorageService {
                     totalQuantity += item.getQuantity();
                 } else if (Objects.equals(item.getTypeOfOperation().toLowerCase(), "уход")) {
                     totalQuantity -= item.getQuantity();
+                } else {
+                    throw new RuntimeException("На складе нет товара с таким id");
                 }
             }
         }
@@ -140,7 +147,7 @@ public class StorageServiceImpl implements StorageService {
     @Override
     public List<Storage> getStorages() {
         List<Storage> storages = new ArrayList<>();
-        List<Specification> allSpecifications = specificationRepository.findAll();
+        List<Specification> allSpecifications = specificationService.getAllSpecificationsSortedById();
 
         LocalDate date = LocalDate.now();
 
@@ -149,17 +156,69 @@ public class StorageServiceImpl implements StorageService {
             Integer totalQuantity = getCountOfSpecificationInStorage(specificationId);
 
             if (totalQuantity > 0) {
-                Storage storage = new Storage();
-                storage.setIdStorage(null);
-                storage.setDate(date);
-                storage.setQuantity(totalQuantity);
-                storage.setTypeOfOperation("Текущее количество");
-                storage.setSpecificationId(specification);
+                Storage storage = new Storage(null, date, totalQuantity, "Текущее количество", specification);
 
                 storages.add(storage);
             }
         }
 
+        storages.sort(Comparator.comparing(s -> s.getSpecificationId().getPositionid()));
+
         return storages;
+    }
+
+    public List<StorageStatistic> getStorageHistoryBySpecificationId(Long specificationId, LocalDate fromDate, LocalDate toDate) {
+        Specification specification = specificationService.getSpecificationById(specificationId);
+        List<Storage> storageHistory = findAllBySpecificationId(specification);
+
+        storageHistory.sort(Comparator.comparing(Storage::getDate));
+
+        List<StorageStatistic> dailyStorage = new ArrayList<>();
+
+        Map<LocalDate, Integer> dailyIncoming = new HashMap<>();
+        Map<LocalDate, Integer> dailyOutgoing = new HashMap<>();
+        Map<LocalDate, Integer> dailyBalance = new HashMap<>();
+
+        int currentRest = 0;
+
+        for (Storage storage : storageHistory) {
+            LocalDate date = storage.getDate();
+            String operation = storage.getTypeOfOperation();
+            int quantity = storage.getQuantity();
+
+            if (operation.equalsIgnoreCase("приход")) {
+                dailyIncoming.merge(date, quantity, Integer::sum);
+                currentRest += quantity;
+            } else if (operation.equalsIgnoreCase("уход")) {
+                dailyOutgoing.merge(date, quantity, Integer::sum);
+                currentRest -= quantity;
+            }
+            dailyBalance.put(date, currentRest);
+        }
+
+        Set<LocalDate> allDates = new HashSet<>(dailyBalance.keySet());
+
+        for (LocalDate date : allDates) {
+            int incoming = dailyIncoming.getOrDefault(date, 0);
+            int outgoing = dailyOutgoing.getOrDefault(date, 0);
+            int balance = dailyBalance.get(date);
+
+            dailyStorage.add(new StorageStatistic(date, incoming, outgoing, balance));
+
+        }
+
+        return dailyStorage.stream()
+                .filter(storage -> {
+                    LocalDate date = storage.getDate();
+                    boolean filterByFromDate = fromDate == null || !date.isBefore(fromDate);
+                    boolean filterByToDate = toDate == null || !date.isAfter(toDate);
+                    return (fromDate == null || filterByFromDate) && (toDate == null || filterByToDate);
+                }).sorted(Comparator.comparing(StorageStatistic::getDate)).toList();
+    }
+
+    private List<Storage> findAllBySpecificationId(Specification specification) {
+        return storageRepository.findAll().stream()
+                .filter(storage -> storage.getSpecificationId().equals(specification))
+                .collect(Collectors.toList());
     }
 }

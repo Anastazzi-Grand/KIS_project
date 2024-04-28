@@ -19,7 +19,6 @@ public class SpecificationServiceImpl implements SpecificationService {
     private SpecificationRepository specificationRepository;
 
     public List<Specification> getAllSpecifications() {
-        System.out.println("GET WORK");
         return specificationRepository.findAll();
     }
 
@@ -35,7 +34,7 @@ public class SpecificationServiceImpl implements SpecificationService {
 
     public Specification getSpecificationById(Long id) {
         return specificationRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Specification not found with id: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Спецификация с ID " + id + " не найдена"));
     }
 
     public Specification createSpecification(Specification specification) {
@@ -43,6 +42,8 @@ public class SpecificationServiceImpl implements SpecificationService {
             Long parentId = specification.getParent().getPositionid();
             Specification parentSpecification = getSpecificationById(parentId);
             specification.setParent(parentSpecification);
+        } else {
+            throw new IllegalArgumentException("Спецификация не найдена с id: " + specification.getPositionid());
         }
 
 
@@ -63,12 +64,13 @@ public class SpecificationServiceImpl implements SpecificationService {
 
     public void deleteSpecification(Long id) {
         Specification specification = specificationRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Заказ с id " + id + " не найден"));
+                .orElseThrow(() -> new IllegalArgumentException("Спецификация с id " + id + " не найдена"));
         specificationRepository.delete(specification);
     }
 
-    private Specification getSpecificationWithParentById(Long id) {
-        Specification specification = getSpecificationById(id);
+    public Specification getSpecificationWithParentById(Long id) {
+        Specification specification = specificationRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Спецификация с ID " + id + " не найдена"));
         if (specification.getParent() != null) {
             Long parentId = specification.getParent().getPositionid();
             if (parentId != null) {

@@ -1,6 +1,7 @@
 package com.restful_project.service;
 
 import com.restful_project.entity.Storage;
+import com.restful_project.entity.model.StorageStatistic;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -23,5 +24,7 @@ public interface StorageService {
     StringBuilder getDeliveriesByDate(LocalDate date);
 
     List<Storage> getStorages();
+
+    List<StorageStatistic> getStorageHistoryBySpecificationId(Long specificationId, LocalDate fromDate, LocalDate toDate);
 }
 

@@ -11,6 +11,7 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "storage")
 public class Storage {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idstorage")
@@ -31,6 +32,16 @@ public class Storage {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonDeserialize(using = SpecificationDeserializer.class)
     private Specification specificationId;
+
+    public Storage() {}
+
+    public Storage(Integer idStorage, LocalDate date, Integer quantity, String typeOfOperation, Specification specificationId) {
+        this.idStorage = idStorage;
+        this.date = date;
+        this.quantity = quantity;
+        this.typeOfOperation = typeOfOperation;
+        this.specificationId = specificationId;
+    }
 
     public Specification getSpecificationId() {
         return specificationId;

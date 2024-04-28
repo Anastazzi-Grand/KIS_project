@@ -18,7 +18,6 @@ public class SpecificationDeserializer extends JsonDeserializer<Specification> {
     @Override
     public Specification deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
         Long parentId = p.getLongValue(); // Получаем значение айди родителя из JSON
-        return specificationRepository.findById(parentId)
-                .orElseThrow(() -> new IllegalArgumentException("Specification not found with id: " + parentId));
+        return specificationRepository.findById(parentId).orElseThrow(() -> new IllegalArgumentException("Спецификация с ID " + parentId + " не найдена"));
     }
 }

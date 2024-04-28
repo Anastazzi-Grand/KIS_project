@@ -9,6 +9,18 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 @ControllerAdvice
 public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException ex, WebRequest request) {
+        Throwable cause = ex.getCause();
+        String body;
+        if (cause instanceof IllegalArgumentException) {
+            body = cause.getMessage();
+        } else {
+            body = "Ошибка при чтении тела запроса";
+        }
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<String> handleRuntimeException(RuntimeException ex, WebRequest request) {
         String body = ex.getMessage();

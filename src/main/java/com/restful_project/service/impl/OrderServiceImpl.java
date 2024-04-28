@@ -48,7 +48,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Order getOrderById(Long id) {
         return orderRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Order not found with id: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Заказ не найден с id: " + id));
     }
 
     @Override
@@ -102,7 +102,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public void deleteOrder(Long id) {
         Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Заказ с id " + id + " не найден"));
+                .orElseThrow(() -> new IllegalArgumentException("Заказ с id " + id + " не найден"));
         orderRepository.delete(order);
     }
 
@@ -122,7 +122,7 @@ public class OrderServiceImpl implements OrderService {
         Storage outboundStorage = new Storage();
         outboundStorage.setDate(order.getOrderDate());
         outboundStorage.setQuantity(orderQuantity); // Отрицательное количество для отпуска
-        outboundStorage.setTypeOfOperation("отпуск");
+        outboundStorage.setTypeOfOperation("уход");
         outboundStorage.setSpecificationId(specification);
         storageRepository.save(outboundStorage);
 

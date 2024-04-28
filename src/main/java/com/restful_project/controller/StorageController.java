@@ -1,6 +1,7 @@
 package com.restful_project.controller;
 
 import com.restful_project.entity.Storage;
+import com.restful_project.entity.model.StorageStatistic;
 import com.restful_project.service.StorageService;
 import com.restful_project.service.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,11 @@ public class StorageController {
     @GetMapping("/getCount/{id}")
     public Integer getCountOfSpecificationInStorage(@PathVariable("id") Long id) {
         return storageService.getCountOfSpecificationInStorage(id);
+    }
+
+    @GetMapping("/getHistory/{id}")
+    public List<StorageStatistic> getStorageHistoryBySpecificationId(@PathVariable("id") Long id, @RequestParam(name="fromDate", required = false) LocalDate fromDate, @RequestParam(name="toDate", required = false) LocalDate toDate) {
+        return storageService.getStorageHistoryBySpecificationId(id, fromDate, toDate);
     }
 
     @GetMapping("/getStorages")
