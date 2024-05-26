@@ -24,6 +24,9 @@ public class Storage {
     @Column(name = "quantity")
     private Integer quantity;
 
+    @Column(name = "measureunit")
+    private String measureUnit;
+
     @Column(name = "typeofoperation")
     private String typeOfOperation;
 
@@ -35,14 +38,22 @@ public class Storage {
 
     public Storage() {}
 
-    public Storage(Integer idStorage, LocalDate date, Integer quantity, String typeOfOperation, Specification specificationId) {
+    public Storage(Integer idStorage, LocalDate date, Integer quantity, String measureUnit, String typeOfOperation, Specification specificationId) {
         this.idStorage = idStorage;
         this.date = date;
         this.quantity = quantity;
         this.typeOfOperation = typeOfOperation;
         this.specificationId = specificationId;
+        this.measureUnit = measureUnit;
     }
 
+    public String getMeasureUnit() {
+        return measureUnit;
+    }
+
+    public void setMeasureUnit(String measureUnit) {
+        this.measureUnit = measureUnit;
+    }
     public Specification getSpecificationId() {
         return specificationId;
     }

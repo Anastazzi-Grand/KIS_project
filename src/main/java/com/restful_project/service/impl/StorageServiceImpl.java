@@ -61,6 +61,7 @@ public class StorageServiceImpl implements StorageService {
         existingStorage.setDate(updatedStorage.getDate());
         existingStorage.setSpecificationId(updatedStorage.getSpecificationId());
         existingStorage.setQuantity(updatedStorage.getQuantity());
+        existingStorage.setMeasureUnit(updatedStorage.getMeasureUnit());
         existingStorage.setTypeOfOperation(updatedStorage.getTypeOfOperation());
 
         Specification specification = existingStorage.getSpecificationId();
@@ -155,8 +156,8 @@ public class StorageServiceImpl implements StorageService {
             Long specificationId = specification.getPositionid();
             Integer totalQuantity = getCountOfSpecificationInStorage(specificationId);
 
-            if (totalQuantity > 0) {
-                Storage storage = new Storage(null, date, totalQuantity, "Текущее количество", specification);
+            if (totalQuantity != 0) {
+                Storage storage = new Storage(null, date, totalQuantity, specification.getUnitMeasurement(), "Текущее количество", specification);
 
                 storages.add(storage);
             }
