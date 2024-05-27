@@ -156,7 +156,7 @@ public class StorageServiceImpl implements StorageService {
             Long specificationId = specification.getPositionid();
             Integer totalQuantity = getCountOfSpecificationInStorage(specificationId);
 
-            if (totalQuantity != 0) {
+            if (totalQuantity > 0) {
                 Storage storage = new Storage(null, date, totalQuantity, specification.getUnitMeasurement(), "Текущее количество", specification);
 
                 storages.add(storage);
@@ -215,6 +215,29 @@ public class StorageServiceImpl implements StorageService {
                     boolean filterByToDate = toDate == null || !date.isAfter(toDate);
                     return (fromDate == null || filterByFromDate) && (toDate == null || filterByToDate);
                 }).sorted(Comparator.comparing(StorageStatistic::getDate)).toList();
+    }
+
+    @Override
+    public List<Storage> getDeficitStorages() {
+        List<Storage> storages = new ArrayList<>();
+        List<Specification> allSpecifications = specificationService.getAllSpecificationsSortedById();
+
+        LocalDate date = LocalDate.now();
+
+        for (Specification specification : allSpecifications) {
+            Long specificationId = specification.getPositionid();
+            Integer totalQuantity = getCountOfSpecificationInStorage(specificationId);
+
+            if (totalQuantity < 0) {
+                Storage storage = new Storage(null, date, totalQuantity, specification.getUnitMeasurement(), "Текущее количество", specification);
+
+                storages.add(storage);
+            }
+        }
+
+        storages.sort(Comparator.comparing(s -> s.getSpecificationId().getPositionid()));
+
+        return storages;
     }
 
     private List<Storage> findAllBySpecificationId(Specification specification) {

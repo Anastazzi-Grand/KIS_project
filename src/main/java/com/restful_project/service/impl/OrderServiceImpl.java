@@ -60,17 +60,17 @@ public class OrderServiceImpl implements OrderService {
             order.setSpecificationId(existingSpecification);
         }
         // Проверяем наличие товаров на складе
-        boolean orderPlaced = placeOrder(order);
+       // placeOrder(order);
 
+        /*
         if (!orderPlaced) {
             // Если заказ не может быть выполнен из-за нехватки товаров на складе
             throw new RuntimeException("Невозможно оформить заказ, на складе недостаточно товаров");
-        }
+        }*/
 
         // Сохраняем заказ в базе данных только если товаров достаточно
-        Order savedOrder = orderRepository.save(order);
 
-        return savedOrder;
+        return orderRepository.save(order);
     }
 
     @Override
@@ -106,17 +106,9 @@ public class OrderServiceImpl implements OrderService {
         orderRepository.delete(order);
     }
 
-    public boolean placeOrder(Order order) {
+    public void placeOrder(Order order) {
         Specification specification = order.getSpecificationId();
         Integer orderQuantity = order.getCount();
-
-        // Получаем количество товаров на складе для данной спецификации
-        Integer stockQuantity = storageService.getCountOfSpecificationInStorage(specification.getPositionid());
-
-        if (stockQuantity == 0 || stockQuantity < orderQuantity) {
-            // Если на складе нет достаточного количества товаров, заказ не может быть выполнен
-            return false;
-        }
 
         // Создаем новую запись в таблице storage с типом операции "отпуск"
         Storage outboundStorage = new Storage();
@@ -125,7 +117,5 @@ public class OrderServiceImpl implements OrderService {
         outboundStorage.setTypeOfOperation("уход");
         outboundStorage.setSpecificationId(specification);
         storageRepository.save(outboundStorage);
-
-        return true;
     }
 }

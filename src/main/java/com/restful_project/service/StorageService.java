@@ -26,5 +26,7 @@ public interface StorageService {
     List<Storage> getStorages();
 
     List<StorageStatistic> getStorageHistoryBySpecificationId(Long specificationId, LocalDate fromDate, LocalDate toDate);
+
+    List<Storage> getDeficitStorages();
 }
 

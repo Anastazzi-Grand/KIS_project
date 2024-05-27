@@ -43,6 +43,11 @@ public class StorageController {
         return storageService.getStorages();
     }
 
+    @GetMapping("/getDeficitStorages")
+    public List<Storage> getDeficitStorages() {
+        return storageService.getDeficitStorages();
+    }
+
     @GetMapping("/deliveries")
     public StringBuilder getDeliveriesByDate(@RequestParam("date") LocalDate date) {
         return storageService.getDeliveriesByDate(date);
